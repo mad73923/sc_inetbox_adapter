@@ -14,6 +14,10 @@ def inetbox_auth(inetbox):
 def test_get_context(inetbox):
     inetbox.create_context()
 
+def test_create_session(inetbox):
+    status_code = inetbox.create_session()
+    assert status_code == 200
+
 def test_devices(inetbox_auth):
     inetbox_auth.get_devices()
 

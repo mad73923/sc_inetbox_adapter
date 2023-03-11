@@ -12,13 +12,14 @@ class Internetbox_Adapter:
         self._auth_token = None
         self._session = requests.Session()
 
-    def create_session(self):
+    def create_session(self)-> int:
         response = self.create_context()
         #TODO check status code
         resp_json = json.loads(response.text)
         self._auth_token = resp_json['data']['contextID']
+        return response.status_code
 
-    def create_context(self):
+    def create_context(self) -> requests.Response:
         payload = json.dumps({"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"webui","username":"admin","password":self._admin_password}})
         headers = {
             'Authorization': 'X-Sah-Login',
@@ -38,23 +39,24 @@ class Internetbox_Adapter:
 
         response = self._send_auth_ws_request(payload)
 
-    def get_software_version(self):
+    def get_software_version(self) -> str:
         payload = json.dumps({"service":"APController","method":"getSoftWareVersion","parameters":{}})
         response = self._send_ws_request(payload)
         #TODO exception handling
         return json.loads(response.text)["data"]["version"]
 
 
-    def _send_ws_request(self, payload: str, headers={}):
+    def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
         url = "%s://%s/ws" % (self._protocol, self._ip_address)
         headers['Content-Type'] = 'application/x-sah-ws-4-call+json'
+        #TODO find solution with certcheck
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         #TODO exception handling
         response = self._session.post(url, headers=headers, data=payload, verify=False)
         print(response.text)
         return response
 
-    def _send_auth_ws_request(self, payload: str, headers={}):
+    def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
         headers['Authorization X-Sah'] = self._auth_token
         headers['X-Context'] = self._auth_token
         return self._send_ws_request(payload, headers)
