@@ -22,9 +22,16 @@ class Internetbox_Adapter:
     def create_context(self) -> requests.Response:
         payload = json.dumps({"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"webui","username":"admin","password":self._admin_password}})
         headers = {
-            'Authorization': 'X-Sah-Login',
+            'Authorization': 'X-Sah-Login'
         }
         return self._send_ws_request(payload, headers)
+
+    def release_context(self) -> requests.Response:
+        payload = json.dumps({"service":"sah.Device.Information","method":"releaseContext","parameters":{"applicationName":"webui"}})
+        headers = {
+            'Authorization': 'X-Sah-Logout %s' % (self._auth_token)
+        }
+        self._send_auth_ws_request(payload, headers)
 
     def get_devices(self):
 
@@ -53,10 +60,10 @@ class Internetbox_Adapter:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         #TODO exception handling
         response = self._session.post(url, headers=headers, data=payload, verify=False)
-        print(response.text)
+        print(json.dumps(json.loads(response.text), indent=2))
         return response
 
     def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
-        headers['Authorization X-Sah'] = self._auth_token
+        #headers['Authorization X-Sah'] = self._auth_token
         headers['X-Context'] = self._auth_token
         return self._send_ws_request(payload, headers)

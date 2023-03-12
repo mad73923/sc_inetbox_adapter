@@ -24,3 +24,6 @@ def test_devices(inetbox_auth):
 def test_version(inetbox):
     ver = inetbox.get_software_version()
     assert ver == "13.20.18"
+
+def test_release_context(inetbox_auth):
+    inetbox_auth.release_context()
