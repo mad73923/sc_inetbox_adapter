@@ -1,10 +1,15 @@
 import pytest
 from sc_inetbox_adapter.sc_inetbox_adapter import Internetbox_Adapter
+from virtual_inetbox import Virtual_Inetbox
 
 @pytest.fixture
-def inetbox():
-    with open(".password") as pwd_file:
-        return Internetbox_Adapter(pwd_file.readline())
+def inetbox(request):
+    if request.config.getoption("--local"):
+        with open(".password") as pwd_file:
+            yield Internetbox_Adapter(pwd_file.readline())
+    else:
+        vbox = Virtual_Inetbox()
+        yield Internetbox_Adapter("test123", ip_address="127.0.0.1:32443")
 
 @pytest.fixture
 def inetbox_auth(inetbox):
