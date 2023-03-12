@@ -64,6 +64,5 @@ class Internetbox_Adapter:
         return response
 
     def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
-        #headers['Authorization X-Sah'] = self._auth_token
         headers['X-Context'] = self._auth_token
         return self._send_ws_request(payload, headers)
