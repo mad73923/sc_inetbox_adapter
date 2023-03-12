@@ -20,6 +20,15 @@ Interested in contributing? Check out the contributing guidelines. Please note t
 
 `sc_inetbox_adapter` was created by Matthias Weis. It is licensed under the terms of the GNU General Public License v3.0 license.
 
+## Develop
+
+In the root dir:
+```bash
+$ python -m venv .
+$ source ./bin/activate
+$ poetry install
+```
+
 ## Credits
 
 `sc_inetbox_adapter` was created with [`cookiecutter`](https://cookiecutter.readthedocs.io/en/latest/) and the `py-pkgs-cookiecutter` [template](https://github.com/py-pkgs/py-pkgs-cookiecutter).
