@@ -30,6 +30,7 @@ $ poetry install
 ```
 
 ## Test
+Place a file named '''.password''' containing the admin password in the root folder and run the tests:
 ```bash
 $ python -m pytest tests
 ```

@@ -1,9 +1,10 @@
 import json
 import requests
 import urllib3
+import http
 
 
-class Internetbox_Adapter:
+class InternetboxAdapter:
 
     def __init__(self, admin_password: str, protocol: str = "https", ip_address: str = "192.168.1.1") -> None:
         self._admin_password = admin_password
@@ -14,25 +15,29 @@ class Internetbox_Adapter:
 
     def create_session(self)-> int:
         response = self.create_context()
-        #TODO check status code
-        self._auth_token = response.json()['data']['contextID']
+        requests.status_codes.codes
+        if response.status_code == http.HTTPStatus.OK:
+            self._auth_token = response.json()['data']['contextID']
         return response.status_code
 
     def create_context(self) -> requests.Response:
-        payload = json.dumps({"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"webui","username":"admin","password":self._admin_password}})
+        payload = json.dumps({"service": "sah.Device.Information", "method": "createContext", "parameters": {
+                             "applicationName": "webui", "username": "admin", "password": self._admin_password}})
         headers = {
             'Authorization': 'X-Sah-Login'
         }
         return self._send_ws_request(payload, headers)
 
     def release_context(self) -> requests.Response:
-        payload = json.dumps({"service":"sah.Device.Information","method":"releaseContext","parameters":{"applicationName":"webui"}})
+
+        payload = json.dumps({"service": "sah.Device.Information",
+                             "method": "releaseContext", "parameters": {"applicationName": "webui"}})
         headers = {
             'Authorization': 'X-Sah-Logout %s' % (self._auth_token)
         }
         self._send_auth_ws_request(payload, headers)
 
-    def get_devices(self):
+    def get_devices(self) -> json:
 
         payload = json.dumps({
         "service": "Devices",
@@ -44,12 +49,14 @@ class Internetbox_Adapter:
         })
 
         response = self._send_auth_ws_request(payload)
+        if response.status_code == http.HTTPStatus.OK:
+            return response.json()["status"]
 
     def get_software_version(self) -> str:
         payload = json.dumps({"service":"APController","method":"getSoftWareVersion","parameters":{}})
         response = self._send_ws_request(payload)
-        #TODO exception handling
-        return response.json()["data"]["version"]
+        if response.status_code == http.HTTPStatus.OK:
+            return response.json()["data"]["version"]
 
 
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
@@ -60,8 +67,10 @@ class Internetbox_Adapter:
         #TODO exception handling
         response = self._session.post(url, headers=headers, data=payload, verify=False)
         #print(json.dumps(response.json(), indent=2))
-        return response
+        return response#TODO exception handling
 
     def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
+        if not self._auth_token:
+            raise Exception("No active session, create one first by calling create_session")
         headers['X-Context'] = self._auth_token
         return self._send_ws_request(payload, headers)

@@ -1,10 +1,11 @@
 import pytest
-from sc_inetbox_adapter.sc_inetbox_adapter import Internetbox_Adapter
+import json
+from sc_inetbox_adapter.sc_inetbox_adapter import InternetboxAdapter
 
 @pytest.fixture
 def inetbox():
     with open(".password") as pwd_file:
-        return Internetbox_Adapter(pwd_file.readline())
+        return InternetboxAdapter(pwd_file.readline())
 
 @pytest.fixture
 def inetbox_auth(inetbox):
@@ -19,7 +20,14 @@ def test_create_session(inetbox):
     assert status_code == 200
 
 def test_devices(inetbox_auth):
-    inetbox_auth.get_devices()
+    response = inetbox_auth.get_devices()
+    print(json.dumps(response, indent=2))
+
+def test_non_auth_call(inetbox):
+    try:
+        response = inetbox.get_devices()
+    except:
+        Exception()
 
 def test_version(inetbox):
     ver = inetbox.get_software_version()
