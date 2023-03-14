@@ -13,7 +13,7 @@ class InternetboxAdapter:
         self._auth_token = None
         self._session = requests.Session()
 
-    def create_session(self)-> int:
+    def create_session(self) -> int:
         response = self.create_context()
         requests.status_codes.codes
         if response.status_code == http.HTTPStatus.OK:
@@ -40,12 +40,12 @@ class InternetboxAdapter:
     def get_devices(self) -> json:
 
         payload = json.dumps({
-        "service": "Devices",
-        "method": "get",
-        "parameters": {
-            "expression": "lan and not self",
-            "flags": "no_actions"
-        }
+            "service": "Devices",
+            "method": "get",
+            "parameters": {
+                "expression": "lan and not self",
+                "flags": "no_actions"
+            }
         })
 
         response = self._send_auth_ws_request(payload)
@@ -53,24 +53,26 @@ class InternetboxAdapter:
             return response.json()["status"]
 
     def get_software_version(self) -> str:
-        payload = json.dumps({"service":"APController","method":"getSoftWareVersion","parameters":{}})
+        payload = json.dumps(
+            {"service": "APController", "method": "getSoftWareVersion", "parameters": {}})
         response = self._send_ws_request(payload)
         if response.status_code == http.HTTPStatus.OK:
             return response.json()["data"]["version"]
 
-
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
         url = "%s://%s/ws" % (self._protocol, self._ip_address)
         headers['Content-Type'] = 'application/x-sah-ws-4-call+json'
-        #TODO find solution with certcheck
+        # TODO find solution with certcheck
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        #TODO exception handling
-        response = self._session.post(url, headers=headers, data=payload, verify=False)
-        #print(json.dumps(response.json(), indent=2))
-        return response#TODO exception handling
+        # TODO exception handling
+        response = self._session.post(
+            url, headers=headers, data=payload, verify=False)
+        # print(json.dumps(response.json(), indent=2))
+        return response
 
     def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
         if not self._auth_token:
-            raise Exception("No active session, create one first by calling create_session")
+            raise Exception(
+                "No active session, create one first by calling create_session")
         headers['X-Context'] = self._auth_token
         return self._send_ws_request(payload, headers)
