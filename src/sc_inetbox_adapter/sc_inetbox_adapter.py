@@ -15,8 +15,7 @@ class Internetbox_Adapter:
     def create_session(self)-> int:
         response = self.create_context()
         #TODO check status code
-        resp_json = json.loads(response.text)
-        self._auth_token = resp_json['data']['contextID']
+        self._auth_token = response.json()['data']['contextID']
         return response.status_code
 
     def create_context(self) -> requests.Response:
@@ -50,7 +49,7 @@ class Internetbox_Adapter:
         payload = json.dumps({"service":"APController","method":"getSoftWareVersion","parameters":{}})
         response = self._send_ws_request(payload)
         #TODO exception handling
-        return json.loads(response.text)["data"]["version"]
+        return response.json()["data"]["version"]
 
 
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
@@ -60,7 +59,7 @@ class Internetbox_Adapter:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         #TODO exception handling
         response = self._session.post(url, headers=headers, data=payload, verify=False)
-        print(json.dumps(json.loads(response.text), indent=2))
+        #print(json.dumps(response.json(), indent=2))
         return response
 
     def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
