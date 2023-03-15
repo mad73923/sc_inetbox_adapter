@@ -35,6 +35,12 @@ Place a file named '''.password''' containing the admin password in the root fol
 $ python -m pytest tests
 ```
 
+## Publish
+```bash
+poetry config pypi-token.test-pypi *TOKEN*
+poetry publish -r test-pypi
+```
+
 ## Credits
 
 `sc_inetbox_adapter` was created with [`cookiecutter`](https://cookiecutter.readthedocs.io/en/latest/) and the `py-pkgs-cookiecutter` [template](https://github.com/py-pkgs/py-pkgs-cookiecutter).
