@@ -13,29 +13,33 @@ class InternetboxAdapter:
         self._auth_token = None
         self._session = requests.Session()
 
-    def create_session(self) -> int:
-        response = self.create_context()
-        requests.status_codes.codes
-        if response.status_code == http.HTTPStatus.OK:
-            self._auth_token = response.json()['data']['contextID']
-        return response.status_code
-
-    def create_context(self) -> requests.Response:
+    def create_session(self) -> http.HTTPStatus:
         payload = json.dumps({"service": "sah.Device.Information", "method": "createContext", "parameters": {
                              "applicationName": "webui", "username": "admin", "password": self._admin_password}})
         headers = {
             'Authorization': 'X-Sah-Login'
         }
-        return self._send_ws_request(payload, headers)
+        response = self._send_ws_request(payload, headers)
+        if response.status_code == http.HTTPStatus.OK:
+            self._auth_token = response.json()['data']['contextID']
+        return response.status_code
 
-    def release_context(self) -> requests.Response:
+    def logout_session(self) -> http.HTTPStatus:
 
         payload = json.dumps({"service": "sah.Device.Information",
                              "method": "releaseContext", "parameters": {"applicationName": "webui"}})
         headers = {
             'Authorization': 'X-Sah-Logout %s' % (self._auth_token)
         }
-        self._send_auth_ws_request(payload, headers)
+        response = self._send_auth_ws_request(payload, headers)
+        return response.status_code
+
+    def get_software_version(self) -> str:
+        payload = json.dumps(
+            {"service": "APController", "method": "getSoftWareVersion", "parameters": {}})
+        response = self._send_ws_request(payload)
+        if response.status_code == http.HTTPStatus.OK:
+            return response.json()["data"]["version"]
 
     def get_devices(self) -> json:
 
@@ -51,13 +55,6 @@ class InternetboxAdapter:
         response = self._send_auth_ws_request(payload)
         if response.status_code == http.HTTPStatus.OK:
             return response.json()["status"]
-
-    def get_software_version(self) -> str:
-        payload = json.dumps(
-            {"service": "APController", "method": "getSoftWareVersion", "parameters": {}})
-        response = self._send_ws_request(payload)
-        if response.status_code == http.HTTPStatus.OK:
-            return response.json()["data"]["version"]
 
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
         url = "%s://%s/ws" % (self._protocol, self._ip_address)
