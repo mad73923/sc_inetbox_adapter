@@ -40,6 +40,8 @@ class InternetboxAdapter:
         response = self._send_ws_request(payload)
         if response.status_code == http.HTTPStatus.OK:
             return response.json()["data"]["version"]
+        else:
+            return "HTTP status code %d, check authentication" % (response.status_code)
 
     def get_devices(self) -> json:
 
@@ -55,6 +57,8 @@ class InternetboxAdapter:
         response = self._send_auth_ws_request(payload)
         if response.status_code == http.HTTPStatus.OK:
             return response.json()["status"]
+        else:
+            return {"error": "Got HTTP status code %d, check authentication" % (response.status_code)}
 
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
         url = "%s://%s/ws" % (self._protocol, self._ip_address)
