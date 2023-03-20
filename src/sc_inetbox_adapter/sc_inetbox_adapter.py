@@ -62,7 +62,22 @@ class InternetboxAdapter:
             return {"error": "Got HTTP status code %d, check authentication" % (response.status_code)}
 
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
-        url = "%s://%s/ws" % (self._protocol, self._host)
+        path = "/ws"
+        return self._send_request(path, payload, headers)
+
+    def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
+        headers = self._add_auth_header(headers)
+        return self._send_ws_request(payload, headers)
+
+    def _add_auth_header(self, headers={}):
+        if not self._auth_token:
+            raise Exception(
+                "No active session, create one first by calling create_session")
+        headers['X-Context'] = self._auth_token
+        return headers
+
+    def _send_request(self, path, payload, headers):
+        url = "%s://%s%s" % (self._protocol, self._host, path)
         headers['Content-Type'] = 'application/x-sah-ws-4-call+json'
         # TODO find solution with certcheck
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -71,10 +86,3 @@ class InternetboxAdapter:
             url, headers=headers, data=payload, verify=False)
         # print(json.dumps(response.json(), indent=2))
         return response
-
-    def _send_auth_ws_request(self, payload: str, headers={}) -> requests.Response:
-        if not self._auth_token:
-            raise Exception(
-                "No active session, create one first by calling create_session")
-        headers['X-Context'] = self._auth_token
-        return self._send_ws_request(payload, headers)
