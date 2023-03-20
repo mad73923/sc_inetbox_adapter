@@ -1,7 +1,7 @@
 import pytest
 import json
 import http
-from sc_inetbox_adapter.sc_inetbox_adapter import InternetboxAdapter
+from sc_inetbox_adapter import InternetboxAdapter
 
 @pytest.fixture
 def inetbox():

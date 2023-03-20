@@ -2,14 +2,15 @@ import json
 import requests
 import urllib3
 import http
+from .const import DEFAULT_HOST, DEFAULT_PROTOCOL
 
 
 class InternetboxAdapter:
 
-    def __init__(self, admin_password: str, protocol: str = "https", ip_address: str = "192.168.1.1") -> None:
+    def __init__(self, admin_password: str, protocol: str = DEFAULT_PROTOCOL, host: str = DEFAULT_HOST) -> None:
         self._admin_password = admin_password
         self._protocol = protocol
-        self._ip_address = ip_address
+        self._host = host
         self._auth_token = None
         self._session = requests.Session()
 
@@ -61,7 +62,7 @@ class InternetboxAdapter:
             return {"error": "Got HTTP status code %d, check authentication" % (response.status_code)}
 
     def _send_ws_request(self, payload: str, headers={}) -> requests.Response:
-        url = "%s://%s/ws" % (self._protocol, self._ip_address)
+        url = "%s://%s/ws" % (self._protocol, self._host)
         headers['Content-Type'] = 'application/x-sah-ws-4-call+json'
         # TODO find solution with certcheck
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
