@@ -2,6 +2,7 @@ import pytest
 import json
 import http
 from sc_inetbox_adapter import InternetboxAdapter
+from sc_inetbox_adapter import NoActiveSessionException
 
 @pytest.fixture
 def inetbox():
@@ -25,7 +26,7 @@ def test_non_auth_call(inetbox):
     try:
         response = inetbox.get_devices()
     except:
-        Exception()
+        NoActiveSessionException
 
 def test_version(inetbox):
     ver = inetbox.get_software_version()

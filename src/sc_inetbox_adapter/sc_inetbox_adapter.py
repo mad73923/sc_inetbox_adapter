@@ -3,6 +3,7 @@ import requests
 import urllib3
 import http
 from .const import DEFAULT_HOST, DEFAULT_SSL
+from .errors import NoActiveSessionException
 
 
 class InternetboxAdapter:
@@ -81,8 +82,7 @@ class InternetboxAdapter:
 
     def _add_auth_header(self, headers={}):
         if not self._auth_token:
-            raise Exception(
-                "No active session, create one first by calling create_session")
+            raise NoActiveSessionException
         headers['X-Context'] = self._auth_token
         return headers
 
