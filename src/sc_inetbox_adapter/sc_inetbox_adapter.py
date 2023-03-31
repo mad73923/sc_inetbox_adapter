@@ -2,17 +2,21 @@ import json
 import requests
 import urllib3
 import http
-from .const import DEFAULT_HOST, DEFAULT_PROTOCOL
+from .const import DEFAULT_HOST, DEFAULT_SSL
 
 
 class InternetboxAdapter:
 
-    def __init__(self, admin_password: str, protocol: str = DEFAULT_PROTOCOL, host: str = DEFAULT_HOST) -> None:
+    def __init__(self, admin_password: str, ssl: bool = DEFAULT_SSL, host: str = DEFAULT_HOST) -> None:
         self._admin_password = admin_password
-        self._protocol = protocol
         self._host = host
         self._auth_token = None
         self._session = requests.Session()
+
+        if ssl:
+            self._protocol = "https"
+        else:
+            self._protocol = "http"
 
     def create_session(self) -> http.HTTPStatus:
         payload = json.dumps({"service": "sah.Device.Information", "method": "createContext", "parameters": {
