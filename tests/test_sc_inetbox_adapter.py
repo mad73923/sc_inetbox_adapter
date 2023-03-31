@@ -31,6 +31,9 @@ def test_version(inetbox):
     ver = inetbox.get_software_version()
     assert ver == "13.20.18"
 
+def test_device_info(inetbox_auth):
+    inetbox_auth.get_device_info()
+
 def test_logout_session(inetbox_auth):
     status_code = inetbox_auth.logout_session()
     assert status_code == http.HTTPStatus.OK

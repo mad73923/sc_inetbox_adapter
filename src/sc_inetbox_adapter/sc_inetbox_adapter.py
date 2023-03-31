@@ -48,6 +48,12 @@ class InternetboxAdapter:
         else:
             return "HTTP status code %d, check authentication" % (response.status_code)
 
+    def get_device_info(self) -> json:
+        headers = self._add_auth_header()
+        payload = json.dumps({"parameters":{}})
+        response = self._send_request("/sysbus/DeviceInfo:get", payload, headers)
+        print(json.dumps(response.json(), indent=2))
+
     def get_devices(self) -> json:
 
         payload = json.dumps({
