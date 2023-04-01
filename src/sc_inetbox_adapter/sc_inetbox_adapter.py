@@ -53,7 +53,8 @@ class InternetboxAdapter:
         headers = self._add_auth_header()
         payload = json.dumps({"parameters":{}})
         response = self._send_request("/sysbus/DeviceInfo:get", payload, headers)
-        print(json.dumps(response.json(), indent=2))
+        #print(json.dumps(response.json()["status"], indent=2))
+        return response.json()["status"]
 
     def get_devices(self) -> json:
 
