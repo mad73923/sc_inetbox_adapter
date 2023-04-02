@@ -1,5 +1,6 @@
 # ---------------------
 # DEFAULTS
 # ---------------------
-DEFAULT_HOST = "192.168.1.1"
+DEFAULT_HOST = "internetbox.swisscom.ch"
 DEFAULT_SSL = True
+DEFAULT_VERIFY_SSL = True

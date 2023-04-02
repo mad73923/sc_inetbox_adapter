@@ -2,17 +2,24 @@ import json
 import requests
 import urllib3
 import http
-from .const import DEFAULT_HOST, DEFAULT_SSL
+from .const import DEFAULT_HOST, DEFAULT_SSL, DEFAULT_VERIFY_SSL
 from .errors import NoActiveSessionException
 
 
 class InternetboxAdapter:
 
-    def __init__(self, admin_password: str, ssl: bool = DEFAULT_SSL, host: str = DEFAULT_HOST) -> None:
+    def __init__(
+            self,
+            admin_password: str,
+            ssl: bool = DEFAULT_SSL,
+            host: str = DEFAULT_HOST,
+            verify_ssl: bool = DEFAULT_VERIFY_SSL
+        ) -> None:
         self._admin_password = admin_password
         self._host = host
         self._auth_token = None
         self._session = requests.Session()
+        self._verify_ssl = verify_ssl
 
         if ssl:
             self._protocol = "https"
@@ -53,7 +60,6 @@ class InternetboxAdapter:
         headers = self._add_auth_header()
         payload = json.dumps({"parameters":{}})
         response = self._send_request("/sysbus/DeviceInfo:get", payload, headers)
-        #print(json.dumps(response.json()["status"], indent=2))
         return response.json()["status"]
 
     def get_devices(self) -> json:
@@ -90,10 +96,9 @@ class InternetboxAdapter:
     def _send_request(self, path, payload, headers):
         url = "%s://%s%s" % (self._protocol, self._host, path)
         headers['Content-Type'] = 'application/x-sah-ws-4-call+json'
-        # TODO find solution with certcheck
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        if not self._verify_ssl:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         # TODO exception handling
         response = self._session.post(
-            url, headers=headers, data=payload, verify=False)
-        # print(json.dumps(response.json(), indent=2))
+            url, headers=headers, data=payload, verify=self._verify_ssl)
         return response
