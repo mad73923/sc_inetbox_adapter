@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sc_inetbox_adapter"
-version = "0.1.1"
+version = "0.1.2"
 description = "API adapter for Swisscom Internet Box"
 authors = ["Matthias Weis"]
 license = "GNU General Public License v3.0"
